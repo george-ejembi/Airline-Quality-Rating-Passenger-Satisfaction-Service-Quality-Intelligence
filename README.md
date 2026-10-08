@@ -1089,9 +1089,9 @@ Demographic variables should be evaluated carefully to determine whether they im
 
 # Author
 
-**George**
+**George.E.Ejembi**
 
-Data Analyst | Machine Learning | Data Intelligence
+Data Analyst | Data Scientist & MLOps
 
 This project demonstrates an end-to-end approach to transforming passenger-level airline data into **service-quality intelligence, predictive insights, and actionable business decisions**.
 
