@@ -1,5 +1,3 @@
-# Airline-Quality-Rating-Passenger-Satisfaction-Service-Quality-Intelligence
-
 # Airline Quality Rating: Passenger Satisfaction & Service Quality Intelligence
 
 **Author & Developer:** George  
