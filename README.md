@@ -1,6 +1,6 @@
 # Airline Quality Rating: Passenger Satisfaction & Service Quality Intelligence
 
-**Author & Developer:** George
+**Author & Developer:** George. E. Ejembi
 
 **Project Type:** End-to-End Data Analytics & Machine Learning
 
