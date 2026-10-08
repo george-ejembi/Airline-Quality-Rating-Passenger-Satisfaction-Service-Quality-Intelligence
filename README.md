@@ -1,10 +1,15 @@
 # Airline Quality Rating: Passenger Satisfaction & Service Quality Intelligence
 
 **Author & Developer:** George
+
 **Project Type:** End-to-End Data Analytics & Machine Learning
+
 **Domain:** Airline / Aviation / Customer Experience
+
 **Target Variable:** `Satisfaction`
+
 **Tech Stack:** Excel · PostgreSQL · Power BI · Python · Machine Learning
+
 
 ---
 
