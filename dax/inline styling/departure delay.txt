@@ -1,0 +1,87 @@
+/* =====================================================================
+   Measure : Departure Delay SVG
+   Group   : _Service Quality \ 4. Report-Only Visuals
+   Model   : Airline Passenger Satisfaction
+   Table   : 'Airline Quality Ratings'
+   Returns : data:image/svg+xml;utf8,... URI  (NOT raw HTML)
+   Depends : (none — reads 'Airline Quality Ratings'[Departure Delay])
+   Version : 1.0
+   Date    : 2026-10-24
+
+   Renders a compact "runway" card:
+     - Status word (On Time / Minor Delay / Delayed / Severe Delay)
+     - Horizontal runway bar filled to min(avg, 60) / 60
+     - Plane icon that slides along the runway with the delay
+     - Scale ticks at 0 / 15 / 30 / 60+ min
+
+   Consumption note (IMPORTANT):
+     The return value is a data URI, not raw HTML. It is designed to be
+     dropped into a visual that accepts an image URL — e.g. the built-in
+     "Image" visual, a table/matrix Image column, or a custom visual
+     that accepts `imageUrl` bindings. Do NOT paste it into HTML Content
+     expecting a rendered card; HTML Content injects the string directly
+     and will show the URI as text.
+
+   Do NOT  : use in aggregations, conditional formatting colour rules,
+             or anywhere a numeric value is expected. The measure returns
+             a string.
+
+   Caveats : see companion doc `departure_delay_svg.md`
+   ===================================================================== */
+
+Departure Delay SVG =
+VAR AvgDelay =
+    COALESCE (
+        AVERAGE ( 'Airline Quality Ratings'[Departure Delay] ),
+        0
+    )
+
+VAR CapMinutes = 60     -- the runway ends at this many minutes
+
+VAR Word =
+    SWITCH ( TRUE (),
+        AvgDelay <= 5,  "On Time",
+        AvgDelay <= 15, "Minor Delay",
+        AvgDelay <= 30, "Delayed",
+        "Severe Delay"
+    )
+
+VAR Color =
+    SWITCH ( TRUE (),
+        AvgDelay <= 5,  "#16A34A",
+        AvgDelay <= 15, "#F59E0B",
+        AvgDelay <= 30, "#F97316",
+        "#DC2626"
+    )
+
+VAR Pct = MIN ( 1, MAX ( 0, DIVIDE ( AvgDelay, CapMinutes ) ) )
+
+VAR PlaneX    = FORMAT ( 10 + 340 * Pct, "0.0", "en-US" )
+VAR FillWidth = FORMAT ( 340 * Pct,      "0.0", "en-US" )
+
+VAR SVG =
+    "<svg xmlns='http://www.w3.org/2000/svg' width='360' height='58' viewBox='0 0 360 58'>" &
+
+    -- Status word
+    "<text x='10' y='15' font-family='Arial' font-size='13' font-weight='bold' fill='" & Color & "'>" & Word & "</text>" &
+
+    -- Runway
+    "<rect x='10' y='28' width='340' height='10' rx='5' fill='#E2E8F0'/>" &
+    "<rect x='10' y='28' width='" & FillWidth & "' height='10' rx='5' fill='" & Color & "'/>" &
+    "<line x1='14' y1='33' x2='346' y2='33' stroke='#FFFFFF' stroke-width='1.5' stroke-dasharray='6 6' opacity='0.8'/>" &
+
+    -- Plane
+    "<g transform='translate(" & PlaneX & " 33) rotate(90) scale(0.75) translate(-12 -12)'>" &
+        "<path fill='#0F172A' d='M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z'/>" &
+    "</g>" &
+
+    -- Scale
+    "<text x='10'  y='54' font-family='Arial' font-size='10' fill='#64748B'>0</text>" &
+    "<text x='95'  y='54' text-anchor='middle' font-family='Arial' font-size='10' fill='#64748B'>15</text>" &
+    "<text x='180' y='54' text-anchor='middle' font-family='Arial' font-size='10' fill='#64748B'>30</text>" &
+    "<text x='350' y='54' text-anchor='end' font-family='Arial' font-size='10' fill='#64748B'>60+ min</text>" &
+
+    "</svg>"
+
+RETURN
+    "data:image/svg+xml;utf8," & SVG
