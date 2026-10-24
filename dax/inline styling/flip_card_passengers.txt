@@ -1,0 +1,67 @@
+/* =====================================================================
+   Measure : Flip Card Passengers
+   Group   : _Satisfaction \ 4. Report-Only Visuals
+   Model   : Airline Passenger Satisfaction
+   Table   : 'Airline Quality Ratings'
+   Returns : HTML string (rendered by an HTML-capable visual)
+   Depends : (none — self-contained)
+   Version : 1.0
+   Date    : 2026-10-24
+
+   FRONT : total passenger count
+   BACK  : satisfied vs neutral/dissatisfied split + percentages
+   Fx    : click-to-flip via the CSS checkbox hack (no JavaScript)
+
+   Requires : an HTML-rendering visual
+              (e.g. "HTML Content" by Daniel Marsh-Patrick, or a card
+              that accepts raw HTML/SVG).
+
+   Do NOT  : use in aggregations, conditional formatting, axis bindings,
+             tooltips, or anywhere a numeric return value is expected.
+             The measure returns a string.
+
+   Caveats : see companion doc `flip_card_passengers.md`
+   ===================================================================== */
+
+Flip Card Passengers =
+VAR Total =
+    COUNTROWS ( 'Airline Quality Ratings' )
+VAR Satisfied =
+    CALCULATE (
+        COUNTROWS ( 'Airline Quality Ratings' ),
+        'Airline Quality Ratings'[satisfaction] = "satisfied"
+    )
+VAR Unsatisfied = Total - Satisfied
+VAR PctSat   = DIVIDE ( Satisfied,   Total )
+VAR PctUnsat = DIVIDE ( Unsatisfied, Total )
+
+RETURN
+"<style>
+  .flip-input{display:none;}
+  .scene{display:block;width:90%;height:193px;perspective:1000px;cursor:pointer;font-family:'Segoe UI',Arial,sans-serif;}
+  .card{position:relative;width:90%;height:90%;transition:transform 0.7s;transform-style:preserve-3d;}
+  .flip-input:checked + .scene .card{transform:rotateY(180deg);}
+  .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;box-shadow:0 4px 14px rgba(0,0,0,0.25);}
+  .front{background:linear-gradient(135deg,#EEA32F,#F5C24C,#FBE273);}
+  .back{background:linear-gradient(135deg,#00695c,#26a69a);transform:rotateY(180deg);}
+  .label{font-size:14px;letter-spacing:1px;text-transform:uppercase;opacity:0.85;}
+  .value{font-size:46px;font-weight:700;margin:6px 0;}
+  .hint{font-size:12px;opacity:0.7;margin-top:8px;}
+  .row{font-size:15px;margin:3px 0;}
+</style>
+<input type='checkbox' id='flip' class='flip-input'>
+<label for='flip' class='scene'>
+  <div class='card'>
+    <div class='face front'>
+      <div class='label'>Total Passengers</div>
+      <div class='value'>" & FORMAT ( Total, "#,0" ) & "</div>
+      <div class='hint'>Tap to flip</div>
+    </div>
+    <div class='face back'>
+      <div class='label'>Passenger Breakdown</div>
+      <div class='row'>Satisfied: " & FORMAT ( Satisfied, "#,0" ) & " (" & FORMAT ( PctSat, "0%" ) & ")</div>
+      <div class='row'>Neutral / Dissatisfied: " & FORMAT ( Unsatisfied, "#,0" ) & " (" & FORMAT ( PctUnsat, "0%" ) & ")</div>
+      <div class='hint'>Tap to flip back</div>
+    </div>
+  </div>
+</label>"
