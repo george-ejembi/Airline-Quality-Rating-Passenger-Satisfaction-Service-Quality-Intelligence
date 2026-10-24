@@ -4,7 +4,7 @@
    Model   : Airline Passenger Satisfaction
    Table   : 'Airline Quality Ratings'
    Returns : HTML string (rendered by an HTML-capable visual)
-   Depends : (none — self-contained)
+   Depends : (airline id and satisfaction rate and dissatisfaction rate)
    Version : 1.0
    Date    : 2026-10-24
 
